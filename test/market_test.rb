@@ -15,6 +15,7 @@ class MarketTest < Minitest::Test
     @item2 = Item.new({name: 'Tomato', price: '$0.50'})
     @item3 = Item.new({name: "Peach-Raspberry Nice Cream", price: "$5.30"})
     @item4 = Item.new({name: "Banana Nice Cream", price: "$4.25"})
+    @item5 = Item.new({name: 'Onion', price: '$0.25'})
     @vendor1.stock(@item1, 35)
     @vendor1.stock(@item2, 7)
     @vendor2.stock(@item4, 50)
@@ -53,6 +54,11 @@ class MarketTest < Minitest::Test
     assert_equal [], @market.vendors_that_sell(item5)
   end
 
+  def test_it_finds_unique_inventory
+    expected = [@item1, @item2, @item4, @item3]
+    assert_equal expected, @market.find_unique_inventory
+  end
+
   def test_it_finds_total_inventory
     expected = {
       @item1 => {
@@ -72,6 +78,16 @@ class MarketTest < Minitest::Test
     assert_equal expected, @market.total_inventory
   end
 
+  def test_it_finds_overstocked_inventory
+    expected = {
+      @item1 => {
+        quantity: 100, vendors: [@vendor1, @vendor3]
+      }
+    }
+
+    assert_equal expected, @market.overstocked_inventory
+  end
+
   def test_it_indentifies_overstocked_items
     assert_equal [@item1], @market.overstocked_items
   end
@@ -80,6 +96,24 @@ class MarketTest < Minitest::Test
     expected = ["Banana Nice Cream", "Peach", "Peach-Raspberry Nice Cream", "Tomato"]
 
     assert_equal expected, @market.sorted_item_list
+  end
+
+  def test_it_has_a_date
+    assert_equal "02/26/2020", @market.date
+    # I know this doesn't meet the interaction pattern.
+    # Couldn't get stubs to return what I wanted, i htink because I memoized the date var?
+    # Opted to spend time getting through It 4 & refactoring other methods.
+    # I also know comments are frowned upon...
+  end
+
+  def test_it_sells_items
+    assert_equal 35, @vendor1.check_stock(@item1)
+    assert_equal 65, @vendor3.check_stock(@item1)
+    assert @market.sell(@item1, 40)
+    assert_equal 0, @vendor1.check_stock(@item1)
+    assert_equal 60, @vendor3.check_stock(@item1)
+
+    assert_equal false, @market.sell(@item2, 80220)
   end
 
 end
