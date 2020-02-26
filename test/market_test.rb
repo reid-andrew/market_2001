@@ -100,10 +100,18 @@ class MarketTest < Minitest::Test
 
   def test_it_has_a_date
     assert_equal "02/26/2020", @market.date
-    # I know this doesn't meet the interaction pattern.
-    # Couldn't get stubs to return what I wanted, i htink because I memoized the date var?
-    # Opted to spend time getting through It 4 & refactoring other methods.
-    # I also know comments are frowned upon...
+
+    now = Date.today
+    not_now = now - 14
+    Date.stubs(:today).returns(not_now)
+    new_market = Market.new("Cherry Creek Farmer's Market")
+
+    assert_equal "02/12/2020", new_market.date
+
+    future_now = now + 1
+    Date.stubs(:today).returns(future_now)
+    new_market2 = Market.new("Madison Farmer's Market")
+    assert_equal "02/27/2020", new_market2.date
   end
 
   def test_it_sells_items
