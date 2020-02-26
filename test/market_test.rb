@@ -72,4 +72,14 @@ class MarketTest < Minitest::Test
     assert_equal expected, @market.total_inventory
   end
 
+  def test_it_indentifies_overstocked_items
+    assert_equal [@item1], @market.overstocked_items
+  end
+
+  def test_it_returns_sorted_item_list
+    expected = ["Banana Nice Cream", "Peach", "Peach-Raspberry Nice Cream", "Tomato"]
+
+    assert_equal expected, @market.sorted_item_list
+  end
+
 end
